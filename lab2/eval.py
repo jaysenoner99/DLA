@@ -61,32 +61,43 @@ def parse_args():
         choices=["logit", "softmax"],
         help="Choose between a max logit or max softmax scoring function",
     )
+    parser.add_argument(
+        "--path",
+        type=str,
+        default="",
+        help="Name of the .pth file that contains the model weights",
+    )
     args = parser.parse_args()
     return args
 
 
-args = parse_args()
-torch.manual_seed(args.seed)
-loader = CIFAR10DataLoader(args)
+def main():
+    args = parse_args()
+    torch.manual_seed(args.seed)
+    loader = CIFAR10DataLoader(args)
 
-train_loader, val_loader, test_loader = loader.get_dataloaders()
+    train_loader, val_loader, test_loader = loader.get_dataloaders()
 
-loader = FakeLoader(args)
-fake_loader = loader.get_dataloaders()
+    loader = FakeLoader(args)
+    fake_loader = loader.get_dataloaders()
 
-run_name = f"evaluate_{args.model}_ood"
-num_classes = len(train_loader.dataset.dataset.classes)
-print("Dataset has " + str(num_classes) + " classes")
-if args.use_wandb:
-    wandb.init(project="lab_2_DLA", name=run_name, config=args)
+    run_name = f"evaluate_{args.model}_ood"
+    num_classes = len(train_loader.dataset.dataset.classes)
+    print("Dataset has " + str(num_classes) + " classes")
+    if args.use_wandb:
+        wandb.init(project="lab_2_DLA", name=run_name, config=args)
 
-if args.model == "ae":
-    test_autoencoder_ood(args, test_loader, fake_loader)
+    if args.model == "ae":
+        test_autoencoder_ood(args, test_loader, fake_loader)
 
-elif args.model == "cnn":
-    if args.score == "logit":
-        score_fun = max_logit
-    elif args.score == "softmax":
-        temp = 1000
-        score_fun = lambda l: max_softmax(l, 1000)
-    test_cnn_ood(args, test_loader, fake_loader, score_fun)
+    elif args.model == "cnn":
+        if args.score == "logit":
+            score_fun = max_logit
+        elif args.score == "softmax":
+            temp = 1000
+            score_fun = lambda l: max_softmax(l, temp)
+        test_cnn_ood(args, test_loader, fake_loader, score_fun)
+
+
+if __name__ == "__main__":
+    main()

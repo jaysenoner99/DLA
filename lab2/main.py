@@ -7,7 +7,7 @@ import torch.nn as nn
 import wandb
 
 
-def parse_args():
+def parse_args_main():
     parser = argparse.ArgumentParser(
         description="Train a MLP/ResMLP/CNN on MNIST/CIFAR10/CIFAR100"
     )
@@ -23,7 +23,7 @@ def parse_args():
     )
     parser.add_argument(
         "--epochs",
-        default=200,
+        default=50,
         type=int,
         metavar="N",
         help="number of total epochs to run",
@@ -40,7 +40,7 @@ def parse_args():
     )
     parser.add_argument("--cos", action="store_true", help="use cosine lr schedule")
 
-    device = "cuda" if torch.cuda.is_available else "cpu"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     parser.add_argument(
         "--device",
         default=device,
@@ -75,12 +75,30 @@ def parse_args():
         default="cnn",
         help="Choose between ae or cnn",
     )
+    parser.add_argument(
+        "--fgsm",
+        action="store_true",
+        help="Enable training with FGSM perturbed samples",
+    )
+    parser.add_argument(
+        "--epsilon",
+        type=float,
+        default=0.07,
+        help="Epsilon value for the FGSM perturbation. Defaults to 0.07",
+    )
+    parser.add_argument(
+        "--path",
+        type=str,
+        default="",
+        help="Name of the .pth file that contains the model weights",
+    )
     args = parser.parse_args()
     return args
 
 
 def main():
-    args = parse_args()
+    print("Running main.py")
+    args = parse_args_main()
     torch.manual_seed(args.seed)
     loader = CIFAR10DataLoader(args)
 
@@ -88,7 +106,7 @@ def main():
 
     loader = FakeLoader(args)
 
-    run_name = f"simple_{args.model}"
+    run_name = f"simple_{args.model}_fgsm_{args.fgsm}"
     num_classes = len(train_loader.dataset.dataset.classes)
     print("Dataset has " + str(num_classes) + " classes")
     if args.use_wandb:
@@ -100,7 +118,8 @@ def main():
         opt = torch.optim.Adam(params=model.parameters(), lr=args.lr)
 
         train(model, opt, train_loader, val_loader, criterion, args)
-        torch.save(model.state_dict(), "./cifar10_CNN.pth")
+        model_name = f"cifar10_{args.model}_fgsm_{args.fgsm}"
+        torch.save(model.state_dict(), "./" + model_name + ".pth")
         top1, top5, _ = test(model, test_loader, criterion, 0, args)
         if args.use_wandb:
             wandb.log(
@@ -118,7 +137,8 @@ def main():
         model = model.to(args.device)
         opt = torch.optim.Adam(params=model.parameters(), lr=args.lr)
         train_ae(model, opt, train_loader, val_loader, criterion, args)
-        torch.save(model.state_dict(), "./cifar10_ae.pth")
+        model_name = f"cifar10_{args.model}_fgsm_{args.fgsm}"
+        torch.save(model.state_dict(), "./" + model_name + ".pth")
         scores_test_ae, val_loss = test_ae(model, test_loader, criterion, 0, args)
 
     wandb.finish()

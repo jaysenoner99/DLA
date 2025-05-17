@@ -1,5 +1,7 @@
 from tqdm import tqdm
+from torchvision import transforms
 import torch.nn.functional as F
+from fgsm import denorm, fgsm_attack
 from sklearn import metrics
 from model import CNN, Autoencoder
 import torch.nn as nn
@@ -9,15 +11,41 @@ import wandb
 import matplotlib.pyplot as plt
 
 
+# Here we define different training fucntions for CNNs/autoencoders to train them with/without adversarial samples
+
+
 def train_single_epoch_ae(net, dataloader, train_optimizer, criterion, epoch, args):
     net.train()
     total_loss, total_num, train_bar = 0.0, 0, tqdm(dataloader)
     adjust_learning_rate(train_optimizer, epoch, args)
+
     for data in train_bar:
         x, y = data
-        x, y = x.to(args.device), y.to(args.device)
-        z, x_rec = net(x)
-        loss = criterion(x, x_rec)
+        x = x.to(args.device)
+
+        use_adv = args.fgsm and (torch.rand(1).item() > 0.5)
+
+        if use_adv:
+            x.requires_grad = True
+            _, x_rec = net(x)
+            loss = criterion(x, x_rec)
+            net.zero_grad()
+            loss.backward()
+            x_grad = x.grad.data
+
+            x_denorm = denorm(x, args)
+            adv_x = fgsm_attack(x_denorm, args.epsilon, x_grad)
+
+            adv_x_normalized = transforms.Normalize(
+                [0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2616]
+            )(adv_x)
+
+            _, x_rec = net(adv_x_normalized)
+            loss = criterion(x, x_rec)
+        else:
+            _, x_rec = net(x)
+            loss = criterion(x, x_rec)
+
         train_optimizer.zero_grad()
         loss.backward()
         train_optimizer.step()
@@ -33,7 +61,36 @@ def train_single_epoch_ae(net, dataloader, train_optimizer, criterion, epoch, ar
                 total_loss / total_num,
             )
         )
+
     return total_loss / total_num
+
+
+# def train_single_epoch_ae(net, dataloader, train_optimizer, criterion, epoch, args):
+#     net.train()
+#     total_loss, total_num, train_bar = 0.0, 0, tqdm(dataloader)
+#     adjust_learning_rate(train_optimizer, epoch, args)
+#     for data in train_bar:
+#         x, y = data
+#         x, y = x.to(args.device), y.to(args.device)
+#         z, x_rec = net(x)
+#         loss = criterion(x, x_rec)
+#         train_optimizer.zero_grad()
+#         loss.backward()
+#         train_optimizer.step()
+#
+#         total_num += x.size(0)
+#         total_loss += loss.item() * x.size(0)
+#
+#         train_bar.set_description(
+#             "Train Epoch: [{}/{}], lr: {:.6f}, Loss: {:.4f}".format(
+#                 epoch,
+#                 args.epochs,
+#                 train_optimizer.param_groups[0]["lr"],
+#                 total_loss / total_num,
+#             )
+#         )
+#     return total_loss / total_num
+#
 
 
 def train_ae(model, opt, train_loader, val_loader, criterion, args):
@@ -52,20 +109,42 @@ def train_ae(model, opt, train_loader, val_loader, criterion, args):
             )
 
 
-# Train a net for a single epoch, monitoring the loss(where each loss.item() is weighted by how much
-# elements are present in the current minibatch)
 def train_single_epoch(net, dataloader, train_optimizer, criterion, epoch, args):
     net.train()
     total_loss, total_num, train_bar = 0.0, 0, tqdm(dataloader)
     adjust_learning_rate(train_optimizer, epoch, args)
+
     for img, label in train_bar:
         img = img.to(args.device)
         label = label.to(args.device)
-        logits = net(img)
-        loss = criterion(logits, label)
+
+        use_adv = args.fgsm and (torch.rand(1).item() > 0.5)
+
+        if use_adv:
+            img.requires_grad = True
+            logits = net(img)
+            loss = criterion(logits, label)
+            net.zero_grad()
+            loss.backward()
+            img_grad = img.grad.data
+
+            img_denorm = denorm(img, args)
+            adv_img = fgsm_attack(img_denorm, args.epsilon, img_grad)
+
+            adv_img_normalized = transforms.Normalize(
+                [0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2616]
+            )(adv_img)
+
+            output = net(adv_img_normalized)
+            loss = criterion(output, label)
+        else:
+            logits = net(img)
+            loss = criterion(logits, label)
+
         train_optimizer.zero_grad()
         loss.backward()
         train_optimizer.step()
+
         total_num += img.size(0)
         total_loss += loss.item() * img.size(0)
 
@@ -77,7 +156,52 @@ def train_single_epoch(net, dataloader, train_optimizer, criterion, epoch, args)
                 total_loss / total_num,
             )
         )
+
     return total_loss / total_num
+
+
+# Train a net with cross entropy for a single epoch, monitoring the loss(where each loss.item() is weighted by how much
+# elements are present in the current minibatch)
+# def train_single_epoch(net, dataloader, train_optimizer, criterion, epoch, args):
+#     net.train()
+#     total_loss, total_num, train_bar = 0.0, 0, tqdm(dataloader)
+#     adjust_learning_rate(train_optimizer, epoch, args)
+#     for img, label in train_bar:
+#         img = img.to(args.device)
+#         label = label.to(args.device)
+#         img.requires_grad = True
+#         logits = net(img)
+#         loss = criterion(logits, label)
+#
+#         if args.fgsm:
+#             net.zero_grad()
+#             loss.backward()
+#             img_grad = img.grad.data
+#             img_denorm = denorm(img, args)
+#             adv_img = fgsm_attack(img_denorm, args.epsilon, img_grad)
+#
+#             adv_img_normalized = transforms.Normalize(
+#                 [0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2616]
+#             )(adv_img)
+#             output_adv = net(adv_img_normalized)
+#
+#             loss = criterion(output_adv, label)
+#
+#         train_optimizer.zero_grad()
+#         loss.backward()
+#         train_optimizer.step()
+#         total_num += img.size(0)
+#         total_loss += loss.item() * img.size(0)
+#
+#         train_bar.set_description(
+#             "Train Epoch: [{}/{}], lr: {:.6f}, Loss: {:.4f}".format(
+#                 epoch,
+#                 args.epochs,
+#                 train_optimizer.param_groups[0]["lr"],
+#                 total_loss / total_num,
+#             )
+#         )
+#     return total_loss / total_num
 
 
 def train(model, opt, train_loader, val_loader, criterion, args):
@@ -179,7 +303,10 @@ def test(net, test_data_loader, criterion, epoch, args):
 def test_autoencoder_ood(args, test_loader, fake_loader):
     model = Autoencoder()
     model.to(args.device)
-    model.load_state_dict(torch.load("cifar10_ae.pth"))
+    if args.path == "":
+        args.path = "cifar10_ae.pth"
+    model.load_state_dict(torch.load(args.path))
+    print("Loaded model: " + args.path)
     criterion = nn.MSELoss(reduction="none")
     scores_test, _ = test_ae(model, test_loader, criterion, 0, args)
     scores_fake, _ = test_ae(model, fake_loader, criterion, 0, args)
@@ -217,7 +344,10 @@ def test_autoencoder_ood(args, test_loader, fake_loader):
 def test_cnn_ood(args, test_loader, fake_loader, score_fun):
     model = CNN()
     model.to(args.device)
-    model.load_state_dict(torch.load("cifar10_CNN.pth"))
+    if args.path == "":
+        args.path = "cifar10_cnn_fgsm_False.pth"
+    model.load_state_dict(torch.load(args.path))
+    print("Loaded model" + args.path)
     scores_test = compute_scores(test_loader, score_fun, model, args)
     scores_fake = compute_scores(fake_loader, score_fun, model, args)
 

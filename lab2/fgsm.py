@@ -11,6 +11,70 @@ import argparse
 import torch
 
 
+def test_targeted_fgsm(model, args, test_loader, epsilon, target_class):
+    correct = 0
+    targeted_success = 0
+    adv_examples = []
+    criterion = nn.CrossEntropyLoss()
+
+    for data, target in tqdm(test_loader):
+        data, target = data.to(args.device), target.to(args.device)
+
+        # Skip batch if any of the samples are already predicted as the target class
+        with torch.no_grad():
+            output = model(data)
+            pred = output.max(1)[1]
+            if (pred == target_class).any():
+                continue
+
+        data.requires_grad = True
+
+        # Replace ground truth label with target label
+        target_labels = torch.full_like(target, target_class)
+
+        output = model(data)
+        loss = criterion(output, target_labels)
+        model.zero_grad()
+        loss.backward()
+
+        data_grad = data.grad.data
+        data_nonorm = denorm(data, args)
+
+        # Generate adversarial example targeting `target_class`
+        perturbed_data = fgsm_attack(
+            data_nonorm, -epsilon, data_grad
+        )  # Use -ε for targeted attack
+        perturbed_data_norm = transforms.Normalize(
+            (0.4914, 0.4822, 0.4465),
+            (0.2470, 0.2435, 0.2616),
+        )(perturbed_data)
+
+        output = model(perturbed_data_norm)
+        final_pred = output.max(1)[1]
+
+        # Count correctly classified original examples
+        correct += (final_pred == target).sum().item()
+        targeted_success += (final_pred == target_labels).sum().item()
+
+        # Save some examples
+        for i in range(len(data)):
+            if len(adv_examples) < 5:
+                adv_ex = perturbed_data[i].squeeze().detach().cpu().numpy()
+                adv_examples.append((target[i].item(), final_pred[i].item(), adv_ex))
+
+    total = len(test_loader.dataset)
+    final_acc = correct / float(total)
+    targeted_acc = targeted_success / float(total)
+
+    print(f"Epsilon: {epsilon}")
+    print(f"Standard Accuracy: {correct}/{total} = {final_acc:.4f}")
+    print(
+        f"Targeted Attack Success Rate (class {target_class}): {targeted_success}/{total} = {targeted_acc:.4f}"
+    )
+
+    return final_acc, targeted_acc, adv_examples
+
+
 def fgsm_attack(image, epsilon, data_grad):
     # Collect the element-wise sign of the data gradient
     sign_data_grad = data_grad.sign()
@@ -88,7 +152,7 @@ def test_autoencoder(model, args, test_loader, epsilon):
     return avg_loss, adv_examples
 
 
-def make_plots_autoencoder(epsilons, losses, examples):
+def make_plots_autoencoder(epsilons, losses, examples, args):
     # Plot 1: MSE vs Epsilon
     fig_loss = plt.figure(figsize=(5, 5))
     plt.plot(epsilons, losses, "*-")
@@ -170,7 +234,7 @@ def test(model, args, test_loader, epsilon):
     return final_acc, adv_examples
 
 
-def parse_args():
+def parse_args_fgsm():
     parser = argparse.ArgumentParser(
         description="Perform a targeted/untargeted fgsm attack"
     )
@@ -224,11 +288,20 @@ def parse_args():
         default=0.2,
         help="Maximum value of the epsilon perturbation coefficient",
     )
+    parser.add_argument(
+        "--path",
+        type=str,
+        default="",
+        help="Name of the .pth file that contains the model weights",
+    )
+    parser.add_argument(
+        "--target-class", type=int, help="Target class for targeted fgsm"
+    )
     args = parser.parse_args()
     return args
 
 
-def make_plots(epsilons, accuracies, examples):
+def make_plots(epsilons, accuracies, examples, args):
     # Plot 1: Accuracy vs Epsilon
     fig_acc = plt.figure(figsize=(5, 5))
     plt.plot(epsilons, accuracies, "*-")
@@ -261,41 +334,74 @@ def make_plots(epsilons, accuracies, examples):
     plt.close(fig_adv)
 
 
-args = parse_args()
-torch.manual_seed(args.seed)
+def main():
+    print("Running fgsm.py")
+    args = parse_args_fgsm()
+    torch.manual_seed(args.seed)
+
+    run_name = f"{args.model}_fgsm"
+    if args.use_wandb:
+        wandb.init(project="lab_2_DLA", name=run_name, config=args)
+    if args.model == "cnn":
+        model = CNN()
+        if args.path == "":
+            args.path = "cifar10_cnn_fgsm_False.pth"
+        model.load_state_dict(torch.load(args.path))
+    elif args.model == "ae":
+        model = Autoencoder()
+        if args.path == "":
+            args.path = "cifar10_ae.pth"
+        model.load_state_dict(torch.load(args.path))
+
+    print("Loaded model: " + args.path)
+    model.to(args.device)
+    accuracies = []
+    attack_success_rate = []
+    examples = []
+    max = args.max
+    step = args.step
+    target_class = (
+        args.target_class
+        if args.target_class is not None and 0 <= args.target_class <= 9
+        else None
+    )
+    epsilons = np.arange(0, max + step, step).tolist()
+    epsilons = np.round(epsilons, 6)
+
+    loader = CIFAR10DataLoader(args)
+    _, _, test_loader = loader.get_dataloaders()
+
+    if args.model == "cnn":
+        # Run test for each epsilon
+        for eps in epsilons:
+            if target_class is not None:
+                acc, attack_acc, ex = test_targeted_fgsm(
+                    model, args, test_loader, eps, target_class
+                )
+                attack_success_rate.append(attack_acc)
+            else:
+                acc, ex = test(model, args, test_loader, eps)
+            accuracies.append(acc)
+            examples.append(ex)
+        make_plots(epsilons, accuracies, examples, args)
+        if target_class is not None and args.use_wandb:
+            # Plot Targeted attack success rate vs epsilon
+            fig_attack_acc = plt.figure(figsize=(8, 5))
+            plt.plot(epsilons, attack_success_rate, marker="o")
+            plt.xlabel("Epsilon")
+            plt.ylabel("Attack Success Rate")
+            plt.title("Attack Success Rate per Epsilon")
+            plt.ylim([0, 1])
+
+            wandb.log({"Attack Success Rate Line Plot": wandb.Image(fig_attack_acc)})
+            plt.close()
+    elif args.model == "ae":
+        for eps in epsilons:
+            loss, ex = test_autoencoder(model, args, test_loader, eps)
+            accuracies.append(loss)
+            examples.append(ex)
+        make_plots_autoencoder(epsilons, accuracies, examples, args)
 
 
-run_name = f"{args.model}_fgsm"
-if args.use_wandb:
-    wandb.init(project="lab_2_DLA", name=run_name, config=args)
-if args.model == "cnn":
-    model = CNN()
-    model.load_state_dict(torch.load("cifar10_CNN.pth"))
-elif args.model == "ae":
-    model = Autoencoder()
-    model.load_state_dict(torch.load("cifar10_ae.pth"))
-
-
-model.to(args.device)
-accuracies = []
-examples = []
-max = args.max
-step = args.step
-epsilons = np.arange(0, max, step).tolist()
-loader = CIFAR10DataLoader(args)
-_, _, test_loader = loader.get_dataloaders()
-
-if args.model == "cnn":
-    # Run test for each epsilon
-    for eps in epsilons:
-        acc, ex = test(model, args, test_loader, eps)
-        accuracies.append(acc)
-        examples.append(ex)
-    make_plots(epsilons, accuracies, examples)
-
-elif args.model == "ae":
-    for eps in epsilons:
-        loss, ex = test_autoencoder(model, args, test_loader, eps)
-        accuracies.append(loss)
-        examples.append(ex)
-    make_plots_autoencoder(epsilons, accuracies, examples)
+if __name__ == "__main__":
+    main()

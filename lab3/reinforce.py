@@ -26,6 +26,7 @@ def reinforce(
     clip_gradients=False,
     deterministic=False,
     temperature=1.0,
+    entropy_coeff=0.01,
     t_schedule=None,
 ):
     """
@@ -46,13 +47,14 @@ def reinforce(
         clip_gradients: If True, clip the norm of the gradients of the policy and value networks
         deterministic: If True, evaluate the learned policy with a deterministic policy sampler every eval_interval iterations
         temperature: Softmax temperature for stochastic policy sampling
+        entropy_coeff: Coefficient for entropy regularization. Defaults to 0.01
         t_schedule: Temperature scheduler. Can be Linear or Exponential. Note that T_min=0.1 and decay_factor=0.999
 
     Returns:
         running_rewards: A list of running rewards over episodes.
     """
     T_start = temperature
-    T_min = 0.1
+    T_min = 0.05
 
     # Check for valid baseline (should probably be done elsewhere).
     if baseline not in ["none", "std", "learned"]:
@@ -90,7 +92,9 @@ def reinforce(
             T = T_start
         log["temperature"] = T
         # Run an episode of the environment, collect everything needed for policy update.
-        (observations, actions, log_probs, rewards) = run_episode(env, policy)
+        (observations, actions, log_probs, rewards, entropies) = run_episode(
+            env, policy
+        )
 
         # Compute the discounted reward for every step of the episode.
         returns = torch.tensor(compute_returns(rewards, gamma), dtype=torch.float32)
@@ -126,7 +130,7 @@ def reinforce(
 
         # Make an optimization step on the policy network.
         opt.zero_grad()
-        policy_loss = (-log_probs * base_returns).mean()
+        policy_loss = (-log_probs * base_returns - entropy_coeff * entropies).mean()
         policy_loss.backward()
         if clip_gradients:
             torch.nn.utils.clip_grad_norm_(policy.parameters(), max_norm=1.0)

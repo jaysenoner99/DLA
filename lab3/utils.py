@@ -12,11 +12,13 @@ def select_action(env, obs, policy, temperature=1.0, deterministic=False):
     if deterministic:
         action = torch.argmax(probs)
         log_prob = torch.log(probs[action])
+        entropy = 0
     else:
         dist = Categorical(probs)
         action = dist.sample()
         log_prob = dist.log_prob(action)
-    return (action.item(), log_prob.reshape(1))
+        entropy = dist.entropy()
+    return (action.item(), log_prob.reshape(1), entropy)
 
 
 # Utility to compute the discounted total reward. Torch doesn't like flipped arrays, so we need to
@@ -46,23 +48,33 @@ def run_episode(env, policy, maxlen=MAX_LEN, temperature=1.0, deterministic=Fals
     actions = []
     log_probs = []
     rewards = []
+    entropies = []
 
     # Reset the environment and start the episode.
     (obs, info) = env.reset()
     for i in range(maxlen):
         # Get the current observation, run the policy and select an action.
         obs = torch.tensor(obs)
-        (action, log_prob) = select_action(env, obs, policy, temperature, deterministic)
+        (action, log_prob, entropy) = select_action(
+            env, obs, policy, temperature, deterministic
+        )
         observations.append(obs)
         actions.append(action)
         log_probs.append(log_prob)
+        entropies.append(entropy)
 
         # Advance the episode by executing the selected action.
         (obs, reward, term, trunc, info) = env.step(action)
         rewards.append(reward)
         if term or trunc:
             break
-    return (observations, actions, torch.cat(log_probs), rewards)
+    return (
+        observations,
+        actions,
+        torch.cat(log_probs),
+        rewards,
+        torch.stack(entropies),
+    )
 
 
 def evaluate_policy(
@@ -78,7 +90,7 @@ def evaluate_policy(
         for t in range(maxlen):
             obs_tensor = torch.tensor(obs, dtype=torch.float32)
             with torch.no_grad():
-                action, _ = select_action(
+                action, _, _ = select_action(
                     env,
                     obs_tensor,
                     policy,

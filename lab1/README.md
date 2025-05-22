@@ -105,8 +105,8 @@ Example CAMs and performance metrics can be found in the `wandb` project.
 #### CNN vs ResNet on CIFAR10
 
 <p align="center">
-  <img src="images/cnn_noskip_gradient_norm_mlp.png" alt="CNN_norm" width="45%" style="margin-right:10px;"/>
-  <img src="images/cnn_skip_gradient_norm_resmlp.png" alt="ResNet_norm" width="45%"/>
+  <img src="images/cnn_noskip_gradient_norm.png" alt="CNN_norm" width="45%" style="margin-right:10px;"/>
+  <img src="images/cnn_skip_gradient_norm.png" alt="ResNet_norm" width="45%"/>
 </p>
 
 

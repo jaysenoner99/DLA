@@ -43,7 +43,7 @@ python main.py --model cnn --fgsm --epsilon 0.05 --use-wandb
 ### 🧪 Example: Perform a targeted attack on a pretrained CNN
 
 ```bash
-python fgsm.py --model cnn --step 0.01 --max 0.2 --target-class 3 --use-wandb
+python fgsm.py --model cnn --path path/to/weights --step 0.025 --max 0.1 --target-class 2 --use-wandb 
 ```
 
 ### 📊 Example: Evaluate OOD detection with max-softmax scoring 

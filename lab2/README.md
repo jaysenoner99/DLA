@@ -212,6 +212,10 @@ Observations:
 
 ### 🖼️ Targeted attacks: FGSM augmented samples and model classifications
 
+Results of attacking pretrained deep CNNs with a targeted FGSM attack with `target_class = 2`. 
+Left : Pretrained deep CNN without augmentations.
+Right: Pretrained deep CNN with FGSM augmented samples (`epsilon = 0.07`).
+
 <p align="center">
   <img src="images/cnn_targeted_samples.png" width="45%" alt="adv examples">
   <img src="images/cnn_fgsm_targeted_samples.png" width="45%" alt="adv examples">
@@ -225,6 +229,13 @@ Observations:
   <img src="images/attack_cnn_fgsm_success_rate.png" width="45%" alt="adv examples">
 </p>
 
+Observations:
+
+- Performing a targeted FGSM attack on the vanilla deep CNN results in an attack success rate that is steadly increasing with the strength of the perturbation `epsilon`.
+- The attack success rate associated with the deep CNN trained using FGSM samples drops when approaching the value of `0.07`, which indicates that the model is more robust to samples that are perturbated with a value of `epsilon` that is similar to the one used during training.
+
+
+🔗 More results available at [Wandb project - lab2](https://wandb.ai/jaysenoner/lab_2_DLA/workspace?nw=nwuserjaysenoner1999)
 
 ---
 
@@ -237,4 +248,4 @@ Observations:
 
 ## 🧑‍💻 Author
 
-Jaysen Oner — [@jaysenoner99](https://github.com/jaysenoner99)
+Jay Senoner — [@jaysenoner99](https://github.com/jaysenoner99)

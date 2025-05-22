@@ -152,12 +152,19 @@ Use this script to test the robustness of your trained model against OOD inputs 
 
 ### 🔒 Training with Adversarial Examples
 
+Results of training a Deep Convolutional Neural Network with (pink curve) and without(violet curve) FGSM augmented samples.
+Note that for every batch processed by the model during training, there is a 50% probability of actually using FGSM samples. 
+This choice was made to ensure that the classification capabilities of the network are not entirely lost (which happens if we train the CNN with only FGSM samples)
+
 <p align="center">
-  <img src="images/train_loss_fgsm.png" width="30%" alt="Train loss">
-  <img src="images/val_loss_fgsm.png" width="30%" alt="Validation Loss">
-  <img src="images/val_acc_fgsm.png" width="30%" alt="Validation accuracy">
+  <img src="images/train_loss_fgsm.png" width="33%" alt="Train loss">
+  <img src="images/val_loss_fgsm.png" width="33%" alt="Validation Loss">
+  <img src="images/val_acc_fgsm.png" width="33%" alt="Validation accuracy">
 </p>
 
+Observations:
+
+- FGSM augmented training helps preventing overfitting, as it is observed by looking at the validation loss curve
 
 
 | Model | FGSM Training | Epsilon | Test Accuracy | Adversarial Accuracy |

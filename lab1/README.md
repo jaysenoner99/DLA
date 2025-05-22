@@ -88,10 +88,12 @@ You can view:
 Key findings include:
 
 - Residual connections significantly improve training stability and final accuracy, especially for deeper networks.
-- CNNs with skip connections demonstrate higher accuracy on CIFAR datasets.
+- Residual connections allow the gradients to backpropagate to earlier layers of the network with a stronger signal
+- CNNs with skip connections demonstrate higher accuracy on CIFAR datasets. Moreover, CNNs with skip connections are less prone to overfitting.
+- This trend is exxagerated when the depth of the convolutional network is increased.
 - Class Activation Maps allow localization of discriminative image regions without additional supervision.
 
-Example CAMs and performance metrics can be found in the `wandb` project.
+More material that supports those findings can be found inside the `wandb` project. 
 
 ### 📈 Gradient Flow on Network Layers
 

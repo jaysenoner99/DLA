@@ -93,6 +93,7 @@ Key findings include:
 - This trend is exxagerated when the depth of the convolutional network is increased.
 - Class Activation Maps allow localization of discriminative image regions without additional supervision.
 
+
 More material that supports those findings can be found inside the `wandb` project. 
 
 ### 📈 Gradient Flow on Network Layers

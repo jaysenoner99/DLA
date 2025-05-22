@@ -1,8 +1,8 @@
 # 🧪 Lab 1 – Deep Neural Networks: MLPs, ResMLPs, and CNNs
 
-This lab focuses on training deep models—**MLPs**, **Residual MLPs**, and **CNNs**—on standard image classification datasets (MNIST, CIFAR10, CIFAR100). The key objectives are:
+This lab focuses on training deep models—**MLPs**, **Residual MLPs**, and **CNNs**—on standard image classification datasets (MNIST, CIFAR10). The key objectives are:
 
-- Reproducing results from:
+- Reproducing results (at a smaller scale) from:
   - 📄 [*Deep Residual Learning for Image Recognition*](https://arxiv.org/abs/1512.03385) (He et al., CVPR 2016)
   - 📄 [*Learning Deep Features for Discriminative Localization*](http://cnnlocalization.csail.mit.edu/) (Zhou et al., CVPR 2016)
 - Understanding the effect of residual connections on model performance
@@ -44,7 +44,7 @@ python main.py --model cnn --dataset cifar10 --skip --layers 2 2 2 2 --use-wandb
 
 ---
 
-## 🧠 Supported Arguments
+## 🧠 'main.py' - Supported Arguments
 
 | Argument         | Description |
 |------------------|-------------|
@@ -64,6 +64,19 @@ python main.py --model cnn --dataset cifar10 --skip --layers 2 2 2 2 --use-wandb
 | `--seed`         | Set random seed for reproducibility |
 | `--device`       | Device to use: `cpu` or `cuda` |
 | `--use-wandb`    | Enable Weights & Biases logging |
+
+
+## 🧠 `main_cam.py` – Supported Arguments
+
+This script generates Class Activation Maps (CAMs) using a pretrained ResNet18 on the **Imagenette** dataset.
+
+| Argument        | Aliases                          | Type   | Default | Description |
+|----------------|----------------------------------|--------|---------|-------------|
+| `--class_index` | `--cls_index`, `--class_idx`, `--cls` | `int`  | `0`     | Class index of the input image. Choose from:<br> `tench (0)`, `English springer (1)`, `cassette player (2)`, `chainsaw (3)`, `church (4)`, `French horn (5)`, `garbage truck (6)`, `gas pump (7)`, `golf ball (8)`, `parachute (9)` |
+| `--sample_index` | `--sample_idx`, `--sample`       | `int`  | `5`     | Index of the image sample to visualize within the selected class. |
+| `--url`         | –                                | `str`  | `""`    | URL of a custom input image from the Imagenette dataset. If provided, it overrides `--class_index` and `--sample_index`. |
+
+> 📌 Note: If you provide a URL, the `class_index` and `sample_index` are ignored.
 
 ---
 

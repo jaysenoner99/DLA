@@ -154,6 +154,7 @@ Use this script to test the robustness of your trained model against OOD inputs 
 
 Results of training a Deep Convolutional Neural Network with (pink curve) and without(violet curve) FGSM augmented samples.
 Note that for every batch processed by the model during training, there is a 50% probability of actually using FGSM samples. 
+In the case of this experiments, the FGSM samples are generated with an epsilon value of 0.07.
 This choice was made to ensure that the classification capabilities of the network are not entirely lost (which happens if we train the CNN with only FGSM samples)
 
 <p align="center">
@@ -173,6 +174,9 @@ Observations:
 | CNN   | ✅             | 0.07    | 67.93%          |
 
 ### 🚫 OOD Detection
+Results of evaluating the OOD capabilities of different pretrained models (using the `eval.py` script). 
+For these experiments, I used real data from CIFAR10 and OOD samples from [FakeData](https://docs.pytorch.org/vision/main/generated/torchvision.datasets.FakeData.html).
+Here we report the results for a shallow CNN, a deep CNN, the same deep CNN trained with FGSM samples and an Autoencoder.
 
 ##### -Shallow CNN
 <p align="center">
@@ -198,9 +202,28 @@ Observations:
   <img src="images/ROC_ae.png" width="45%" alt="ae OOD evaluation">
 </p>
 
+Observations:
+
+- The histogram shows that both the shallow CNN and the deep CNN are not able to detect OOD samples.
+- There is an improvement in OOD detection for the deep CNN model when the model is pretrained on FGSM samples. This observation can be further consolidated by comparing the AUROC scores of both models.
+- The Autoencoder model has the best OOD detection performances out of all the tested models, proving that the Autoencoder model is more suited for the task of anomaly detection.
+
 ---
 
-## 🖼️ Example Results
+### 🖼️ Targeted attacks: FGSM augmented samples and model classifications
+
+<p align="center">
+  <img src="images/cnn_targeted_samples.png" width="45%" alt="adv examples">
+  <img src="images/cnn_fgsm_targeted_samples.png" width="45%" alt="adv examples">
+</p>
+
+
+### 📈 Targeted attacks: Attack success rate
+
+<p align="center">
+  <img src="images/attack_cnn_success_rate.png" width="45%" alt="adv examples">
+  <img src="images/attack_cnn_fgsm_success_rate.png" width="45%" alt="adv examples">
+</p>
 
 
 ---

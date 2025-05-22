@@ -165,19 +165,32 @@ This choice was made to ensure that the classification capabilities of the netwo
 Observations:
 
 - FGSM augmented training helps preventing overfitting, as it is observed by looking at the validation loss curve
+- FGSM augmented training achieves an higher accuracy on both the test and the validation set.
 
-
-| Model | FGSM Training | Epsilon | Test Accuracy | Adversarial Accuracy |
-|-------|---------------|---------|----------------|----------------------|
-| CNN   | ❌             | -       | 91.2%          | 12.7%                |
-| CNN   | ✅             | 0.07    | 89.5%          | 74.3%                |
+| Model | FGSM Training | Epsilon | Test Accuracy | 
+|-------|---------------|---------|----------------|
+| CNN   | ❌             | -       | 64.78%          | 
+| CNN   | ✅             | 0.07    | 67.93%          |
 
 ### 🚫 OOD Detection
 
-| Model | Scoring Function | OOD Dataset    | AUROC |
-|-------|------------------|----------------|--------|
-| CNN   | Softmax          | FashionMNIST   | 92.5%  |
-| AE    | Logit            | SVHN           | 88.1%  |
+##### Shallow CNN
+<p align="center">
+  <img src="images/cnn_evaluate_softmax.png" width="45%" alt="cnn OOD evaluation">
+  <img src="images/ROC_cnn.png" width="45%" alt="cnn OOD evaluation">
+</p>
+
+##### Deep CNN
+<p align="center">
+  <img src="images/deep_cnn_evaluate_softmax.png" width="45%" alt="cnn OOD evaluation">
+  <img src="images/deep_cnn_ROC.png" width="45%" alt="cnn OOD evaluation">
+</p>
+
+##### Autoencoder
+<p align="center">
+  <img src="images/ae_evaluate.png" width="45%" alt="ae OOD evaluation">
+  <img src="images/ROC_ae.png" width="45%" alt="ae OOD evaluation">
+</p>
 
 ---
 

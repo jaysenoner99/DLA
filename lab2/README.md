@@ -174,19 +174,25 @@ Observations:
 
 ### 🚫 OOD Detection
 
-##### Shallow CNN
+##### -Shallow CNN
 <p align="center">
   <img src="images/cnn_evaluate_softmax.png" width="45%" alt="cnn OOD evaluation">
   <img src="images/ROC_cnn.png" width="45%" alt="cnn OOD evaluation">
 </p>
 
-##### Deep CNN
+##### -Deep CNN
 <p align="center">
   <img src="images/deep_cnn_evaluate_softmax.png" width="45%" alt="cnn OOD evaluation">
   <img src="images/deep_cnn_ROC.png" width="45%" alt="cnn OOD evaluation">
 </p>
 
-##### Autoencoder
+##### -Deep CNN trained with FGSM samples 
+<p align="center">
+  <img src="images/deep_cnn_fgsm_softmax.png" width="45%" alt="cnn OOD evaluation">
+  <img src="images/deep_cnn_fgsm_ROC.png" width="45%" alt="cnn OOD evaluation">
+</p>
+
+##### -Autoencoder
 <p align="center">
   <img src="images/ae_evaluate.png" width="45%" alt="ae OOD evaluation">
   <img src="images/ROC_ae.png" width="45%" alt="ae OOD evaluation">

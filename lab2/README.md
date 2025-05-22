@@ -18,36 +18,35 @@ This folder contains the implementation of the second laboratory assignment for 
 
 ---
 
-## 🛠️ Installation
+## 📂 Folder Structure
 
 ```bash
-pip install -r requirements.txt
+lab2/
+│
+├── dataloaders.py          # Utilities to load datasets
+├── model.py                # CNN and Autoencoder implementations
+├── fgsm.py                 # Perform targeted/untargeted attacks on pretrained classification networks
+├── main.py                 # Main training entry point
+├── train_and_test.py       # Training and testing routines
+└── README.md               # This file
 ```
-
-Clone the repository:
-
-```bash
-git clone https://github.com/jaysenoner99/DLA.git
-cd DLA/lab2
-```
-
 ---
 
 ## 🚀 Usage
 
-### 🔧 Training
+### 🔧 Example: Train a CNN with FGSM augmented samples
 
 ```bash
 python main.py --model cnn --fgsm --epsilon 0.05 --use-wandb
 ```
 
-### 🧪 FGSM Attacks
+### 🧪 Example: Perform a targeted attack on a pretrained CNN
 
 ```bash
 python fgsm.py --model cnn --step 0.01 --max 0.2 --target-class 3 --use-wandb
 ```
 
-### 📊 Evaluation (OOD Detection)
+### 📊 Example: Evaluate OOD detection with max-softmax scoring 
 
 ```bash
 python eval.py --model cnn --score softmax --path path_to_weights.pth
@@ -58,6 +57,16 @@ python eval.py --model cnn --score softmax --path path_to_weights.pth
 ## 📥 Supported Arguments
 
 ### `main.py`
+
+This script trains either a CNN classifier or an Autoencoder on CIFAR-10 with options for:
+
+- Customizable learning rate, epochs, batch size, and learning rate schedules (step or cosine).
+- Using FGSM adversarial samples during training (`--fgsm` flag).
+- Device selection (CPU/GPU auto-detection).
+- Reproducibility through random seed setting.
+- Optional integration with Weights & Biases (`wandb`) for experiment tracking.
+- Saving trained model weights automatically.
+- Reporting test accuracy (top-1 and top-5 for CNN) or reconstruction metrics (for AE).
 
 | Argument       | Description                                                                 |
 |----------------|-----------------------------------------------------------------------------|
@@ -79,6 +88,23 @@ python eval.py --model cnn --score softmax --path path_to_weights.pth
 
 ### `fgsm.py`
 
+This script performs and evaluates Fast Gradient Sign Method (FGSM) adversarial attacks on pretrained CNN or Autoencoder models trained on CIFAR-10.
+
+- Supports **targeted** and **untargeted** FGSM attacks.
+- Generates adversarial examples by perturbing inputs in the direction of the gradient.
+- Evaluates model accuracy under different perturbation strengths (`epsilon` values).
+- For CNNs:
+  - Measures classification accuracy and targeted attack success rate.
+- For Autoencoders:
+  - Measures reconstruction error (MSE) on perturbed inputs.
+- Visualizes results:
+  - Accuracy or loss vs epsilon plots.
+  - Sample adversarial examples.
+  - Targeted attack success rate
+- Integrates with Weights & Biases (`wandb`) for logging.
+
+Use this script to assess model robustness to adversarial perturbations and analyze the effect of varying attack strengths.
+
 | Argument         | Description                                                                 |
 |------------------|-----------------------------------------------------------------------------|
 | `--device`       | Device to use (`cpu` or `cuda`, auto-selected)                             |
@@ -95,6 +121,18 @@ python eval.py --model cnn --score softmax --path path_to_weights.pth
 ---
 
 ### `eval.py`
+
+This script evaluates a pretrained model's ability to distinguish in-distribution (ID) from out-of-distribution (OOD) samples using simple scoring functions.
+
+- Loads a CNN or autoencoder trained on CIFAR-10.
+- Loads a set of fake (OOD) samples.
+- Computes OOD scores using either:
+  - **Max logit**
+  - **Max softmax** 
+- Evaluates the model’s performance in separating ID and OOD data.
+- Supports Weights & Biases (`wandb`) for logging metrics and visualizations.
+
+Use this script to test the robustness of your trained model against OOD inputs by analyzing score distributions and computing metrics like AUROC.
 
 | Argument       | Description                                                                 |
 |----------------|-----------------------------------------------------------------------------|

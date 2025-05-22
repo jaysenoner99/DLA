@@ -46,6 +46,9 @@ python main.py --model cnn --dataset cifar10 --skip --layers 2 2 2 2 --use-wandb
 
 ## 🧠 'main.py' - Supported Arguments
 
+This script provides an entry point to train MLP, ResMLP(MLP with Residual connections), CNNs and ResNet models. 
+The implementation of the CNN models relies on the 'BasicBlock' definition in [torchvision](https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py#L59)
+
 | Argument         | Description |
 |------------------|-------------|
 | `--model`        | Model type to use: `mlp`, `resmlp`, `cnn` |

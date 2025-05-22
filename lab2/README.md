@@ -152,6 +152,14 @@ Use this script to test the robustness of your trained model against OOD inputs 
 
 ### 🔒 Training with Adversarial Examples
 
+<p align="center">
+  <img src="images/train_loss_fgsm.png" width="30%" alt="Train loss">
+  <img src="images/val_loss_fgsm.png" width="30%" alt="Validation Loss">
+  <img src="images/val_acc_fgsm.png" width="30%" alt="Validation accuracy">
+</p>
+
+
+
 | Model | FGSM Training | Epsilon | Test Accuracy | Adversarial Accuracy |
 |-------|---------------|---------|----------------|----------------------|
 | CNN   | ❌             | -       | 91.2%          | 12.7%                |
@@ -168,10 +176,6 @@ Use this script to test the robustness of your trained model against OOD inputs 
 
 ## 🖼️ Example Results
 
-<p align="center">
-  <img src="assets/adversarial_example.png" width="45%" alt="Adversarial Attack Example">
-  <img src="assets/ood_detection.png" width="45%" alt="OOD Detection ROC Curve">
-</p>
 
 ---
 

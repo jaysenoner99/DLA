@@ -150,7 +150,7 @@ Use this script to test the robustness of your trained model against OOD inputs 
 
 ## 📊 Results Summary
 
-### 🔒 Adversarial Robustness
+### 🔒 Training with Adversarial Examples
 
 | Model | FGSM Training | Epsilon | Test Accuracy | Adversarial Accuracy |
 |-------|---------------|---------|----------------|----------------------|

@@ -1,12 +1,81 @@
-This is the README.md file for the first laboratory project of the course Deep Learning Application,
-held at the University of Florence for the MSc degree in AI.
+# Deep Learning Applications – Laboratory Assignments
 
+This repository contains the implementation of three laboratory assignments developed for the *Deep Learning Applications* course, part of the MSc in Artificial Intelligence at the **University of Florence**.
 
-## Setup 
+Each lab is organized in a separate folder and includes all code required to reproduce the experiments and results. While each lab includes a dedicated `README.md` with experiment-specific details and visualizations, full training logs and results are available through public **Weights & Biases** (W&B) project pages, linked below.
 
-To install the required dependencies, clone this repo inside an empty directory, initialize an empty Python
-virtual environment with your favorite virtual environment manager, and run:
+---
 
-  pip install -r requirements.txt
+## 📁 Lab Overviews
 
+### **Lab 1 – Working with Deep Models**
+
+This lab explores training deep neural networks using MLPs and CNNs, with a particular focus on **residual connections**. The main goal is to reproduce (on a smaller scale) the findings from the paper:
+
+> [**Deep Residual Learning for Image Recognition**](https://arxiv.org/abs/1512.03385) – Kaiming He et al., CVPR 2016
+
+Additionally, the lab includes an implementation of **Class Activation Maps (CAMs)** based on:
+
+> [**Learning Deep Features for Discriminative Localization**](http://cnnlocalization.csail.mit.edu/#:~:text=A%20class%20activation%20map%20for,decision%20made%20by%20the%20CNN.) – Zhou et al., CVPR 2016
+
+🔗 [View results on Weights & Biases](https://wandb.ai/jaysenoner/lab_1_DLA?nw=nwuserjaysenoner1999)
+
+---
+
+### **Lab 2 – Adversarial Machine Learning & OOD Detection**
+
+This lab focuses on:
+
+- **Out-of-Distribution (OOD)** detection pipelines and evaluation metrics
+- Implementation of **targeted and untargeted FGSM** (Fast Gradient Sign Method) adversarial attacks from:
+
+> [**Explaining and Harnessing Adversarial Examples**](https://arxiv.org/pdf/1412.6572) – Goodfellow et al., 2015
+
+The adversarial examples are used to fool classifiers and to enhance adversarial robustness through data augmentation.
+
+🔗 [View results on Weights & Biases](https://wandb.ai/jaysenoner/lab_2_DLA?nw=nwuserjaysenoner1999)
+
+---
+
+### **Lab 3 – Deep Reinforcement Learning**
+
+This lab features a modular and configurable implementation of the **REINFORCE algorithm**, based on:
+
+> [**Simple Statistical Gradient-Following Algorithms for Connectionist Reinforcement Learning**](https://link.springer.com/article/10.1007/BF00992696#citeas) – Williams, 1992
+
+It is applied to two environments from [Gymnasium](https://gymnasium.farama.org/):
+
+- [CartPole-v1](https://gymnasium.farama.org/environments/classic_control/cart_pole/)
+- [LunarLander-v3](https://gymnasium.farama.org/environments/box2d/lunar_lander/)
+
+🔗 [CartPole Results](https://wandb.ai/jaysenoner/DLA2025-Cartpole?nw=nwuserjaysenoner1999)  
+🔗 [Lunar Lander Results](https://wandb.ai/jaysenoner/DLA2025-LunarLander?nw=nwuserjaysenoner1999)
+
+---
+
+## ⚙️ Setup Instructions
+
+To get started, clone the repository and install the required Python packages.
+
+```bash
+# Clone the repository
+git clone https://github.com/jaysenoner99/DLA.git
+cd DLA
+```
+
+We recommend using a virtual environment (e.g., `venv`, `conda`, `poetry`) to manage dependencies:
+
+```bash
+# Create and activate a virtual environment (example using venv)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+Then install the required packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+Each lab may contain additional setup notes or specific dependencies, which are documented in the corresponding subfolder’s `README.md`.
 

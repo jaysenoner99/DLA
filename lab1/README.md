@@ -140,7 +140,7 @@ More material that supports those findings can be found inside the `wandb` proje
   <img src="images/cam_gas_pump.jpg" alt="CNN_norm" width="45%" style="margin-right:10px;"/>
   <img src="images/imagenette_CAM_result.jpg" alt="ResNet_norm" width="45%"/>
 </p>
----
+
 
 ## 📎 References
 

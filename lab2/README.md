@@ -174,8 +174,8 @@ Observations:
 | CNN   | ✅             | 0.07    | 67.93%          |
 
 ### 🚫 OOD Detection
-Results of evaluating the OOD capabilities of different pretrained models (using the `eval.py` script). 
-For these experiments, I used real data from CIFAR10 and OOD samples from [FakeData](https://docs.pytorch.org/vision/main/generated/torchvision.datasets.FakeData.html).
+Results of evaluating the OOD capabilities of different pretrained models (using the `eval.py` script). \
+For these experiments, I used real data from CIFAR10 and OOD samples from [FakeData](https://docs.pytorch.org/vision/main/generated/torchvision.datasets.FakeData.html).\
 Here we report the results for a shallow CNN, a deep CNN, the same deep CNN trained with FGSM samples and an Autoencoder.
 
 ##### -Shallow CNN
@@ -212,8 +212,8 @@ Observations:
 
 ### 🖼️ Targeted attacks: FGSM augmented samples and model classifications
 
-Results of attacking pretrained deep CNNs with a targeted FGSM attack with `target_class = 2`. 
-Left : Pretrained deep CNN without augmentations.
+Results of attacking pretrained deep CNNs with a targeted FGSM attack with `target_class = 2`. \
+Left : Pretrained deep CNN without augmentations.\
 Right: Pretrained deep CNN with FGSM augmented samples (`epsilon = 0.07`).
 
 <p align="center">

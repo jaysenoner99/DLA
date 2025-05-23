@@ -130,8 +130,6 @@ wandb/latest-run/files/checkpoint-BEST_EVAL_POLICY.pt
 
 #### 🏗️ Cartpole-v1: Qualitative Results
 
-![Cartpole gif](images/cartpole_loop.gif)
-
 <p align="center">
   <img src="images/cartpole_loop.gif" alt="Demo" />
 </p>
@@ -143,9 +141,24 @@ wandb/latest-run/files/checkpoint-BEST_EVAL_POLICY.pt
   <img src="images/cartpole_avg_det_eval_reward.png" width="45%" alt="cartpolereward">
 </p>
 
+🔗 More results available at [Cartpole](https://wandb.ai/jaysenoner/DLA2025-Cartpole?nw=nwuserjaysenoner1999)
+
+
+Observations:
+
+- (Personal) This was the hardest lab for me since I haven't got any prior experience in Reinforcement Learning. However, it was also the funniest one.
+- Reinforce without baseline (`none_base_eval`, yellow line) consistently performs poorly in both training and evaluation, struggling to achieve high rewards and exhibiting high instability. This clearly demonstrates the critical need for a baseline in REINFORCE
+- This is further confirmed by the other experiment without baseline but with a deeper and wider policy network (`none_w256_d2`, blue line), which shows a catastrophic collapse after initial learning, highlighting potential instability during training without baseline and proper hyperparameter tuning
+- Various learned baseline approaches (`linearT`, `expT`, `clip+norm`, `norm`) and the standardized reward baseline (`std_base_deteval`,) all show strong performance, generally converging to high rewards by around 400-600 steps.
+- There are minor differences in convergence speed and stability, but overall, most baseline strategies are effective for this simpler environment
+- Overall, better performances are reached by using a learned baseline with a temperature scaling (`learned_base_linearT`, green line  or `learned_base_expT`, orange line)
+
 #### 🌕 LunarLander-v3: Qualitative Results
 
-![LunarLander gif](images/landing_loop.gif)
+<p align="center">
+  <img src="images/landing_loop.gif" alt="Demo" />
+</p>
+
 
 #### 🌕 LunarLander-v3: Stochastic and Deterministic Average Evaluation Rewards
 
@@ -153,4 +166,11 @@ wandb/latest-run/files/checkpoint-BEST_EVAL_POLICY.pt
   <img src="images/lander_eval_stochastic_avg_reward.png" width="45%" alt="cnn OOD evaluation">
   <img src="images/lander_avg_det_eval_reward.png" width="45%" alt="cartpolereward">
 </p>
+
+🔗 More results available at [Wandb - LunarLander](https://wandb.ai/jaysenoner/DLA2025-LunarLander)
+
+- To solve the LunarLander environment with REINFORCE I needed to implement a lot of tricks in order to stabilize training such as normalizing advantages, entropy regularization and temperature scaling
+- LunarLander is a more challenging environment, and this is reflected in the reward curves: Initial rewards are highly negative, and the learning process shows significant variance across different runs
+- I managed to achieve a peak average evaluation reward of approx `277` (violet curve) by training an agent with REINFORCE for 7000 episodes, using gradient clipping, advantage normalization, exponential temperature scheduling (with a starting temperature of 2), entropy regularization and a deeper and wider network with respect to our baseline (`width = 256` instead of `128`, `depth = 2` instead of `1`)
+- For more complex tasks like LunarLander, REINFORCE exhibits higher variance and greater sensitivity to hyperparameters. Achieving good performance is possible but not guaranteed, often requiring careful tuning and potentially many trials. The results highlight the challenges of applying vanilla REINFORCE to harder problems without more advanced techniques for variance reduction or exploration. 
 

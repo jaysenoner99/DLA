@@ -132,6 +132,10 @@ wandb/latest-run/files/checkpoint-BEST_EVAL_POLICY.pt
 
 ![Cartpole gif](images/cartpole_loop.gif)
 
+<p align="center">
+  <img src="images/cartpole_loop.gif" alt="Demo" />
+</p>
+
 #### 🏗️ Cartpole-v1: Stochastic and Deterministic Average Evaluation Rewards
 
 <p align="center">

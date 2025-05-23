@@ -126,15 +126,14 @@ wandb/latest-run/files/checkpoint-BEST_EVAL_POLICY.pt
 
 ## 📊 Results Summary
 
+#### 🏗️ Cartpole-v1 
+
+![Cartpole gif](images/cartpole_loop.gif)
+
+#### 🌕 LunarLander-v3
+
+![LunarLander gif](images/landing_loop.gif)
 
 
-### 🖼️ Qualitative Results: 
-
-#### Cartpole-v1
-
-![Cartpole gif](images/cartpole.gif)
-
-#### LunarLander-v3
-
-![LunarLander gif](images/betterlanding.gif)
+### 
 

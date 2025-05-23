@@ -41,18 +41,20 @@ Use `main.py` to train an agent on a given environment.
 
 ### 🔧 Example: Train an agent on LunarLander-v3 
 
-'''bash
+```bash
 python main.py --env lunarlander --baseline std --episodes 1000 --depth 2 --width 256 --normalize --clip-grad --det --T 1.0 --t-schedule exp
-'''
+```
 
 ### 🎮 Example: Visualize a pretrained agent trying to do its best
 
-'''bash
+```bash
 python visualize.py --checkpoint path/to/policy_weights
-'''
+```
+### 🎮 Example: Save a gif of an agent landing on the moon
 
-
-
+```bash
+python visualize.py --checkpoint path/to/policy_weights --env lunarlander --gif --deterministic --gif-path landing_loop.gif
+```
 ## 📥 Supported Arguments
 
 ###  `main.py`
@@ -126,14 +128,25 @@ wandb/latest-run/files/checkpoint-BEST_EVAL_POLICY.pt
 
 ## 📊 Results Summary
 
-#### 🏗️ Cartpole-v1 
+#### 🏗️ Cartpole-v1: Qualitative Results
 
 ![Cartpole gif](images/cartpole_loop.gif)
 
-#### 🌕 LunarLander-v3
+#### 🏗️ Cartpole-v1: Stochastic and Deterministic Average Evaluation Rewards
+
+<p align="center">
+  <img src="images/cartpole_eval_avg_stochastic_reward.png" width="45%" alt="cnn OOD evaluation">
+  <img src="images/cartpole_avg_det_eval_reward.png" width="45%" alt="cartpolereward">
+</p>
+
+#### 🌕 LunarLander-v3: Qualitative Results
 
 ![LunarLander gif](images/landing_loop.gif)
 
+#### 🌕 LunarLander-v3: Stochastic and Deterministic Average Evaluation Rewards
 
-### 
+<p align="center">
+  <img src="images/lander_eval_stochastic_avg_reward.png" width="45%" alt="cnn OOD evaluation">
+  <img src="images/lander_avg_det_eval_reward.png" width="45%" alt="cartpolereward">
+</p>
 

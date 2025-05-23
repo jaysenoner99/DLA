@@ -99,7 +99,7 @@ def main():
         frames = render_and_record_episode(
             env, policy, temperature=args.temperature, deterministic=args.deterministic
         )
-        imageio.mimsave(args.gif_path, frames, fps=30)
+        imageio.mimsave(args.gif_path, frames, fps=30, loop=0)
         print(f"GIF saved at {args.gif_path}")
     else:
         for i in range(args.episodes):

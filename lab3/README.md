@@ -59,13 +59,13 @@ python visualize.py --checkpoint path/to/policy_weights
 
 This script is the main training entry point for running the REINFORCE algorithm using PyTorch on CartPole-v1 or LunarLander-v3 environments. 
 
--Manages experiment configuration and logging
+- Manages experiment configuration and logging
 
--Sets up environments and models
+- Sets up environments and models
 
--Trains a REINFORCE agent using the specified configuration
+- Trains a REINFORCE agent using the specified configuration
 
--Optionally visualizes the trained agent
+- Optionally visualizes the trained agent
 
 | Argument              | Description                                                                 |
 |-----------------------|-----------------------------------------------------------------------------|

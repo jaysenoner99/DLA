@@ -36,9 +36,9 @@ Use `main.py` to train an agent on a given environment.
 
 ### 🔧 Example: Train an agent on LunarLander-v3 
 
-```bash
+'''bash
 python main.py --env lunarlander --baseline std --episodes 1000 --depth 2 --width 256 --normalize --clip-grad --det --T 1.0 --t-schedule exp
-```
+'''
 
 ### 🎮 Example: Visualize a pretrained agent trying to do its best
 
@@ -117,6 +117,8 @@ wandb/latest-run/files/checkpoint-BEST_EVAL_POLICY.pt
 ---
 
 ## 📊 Results Summary
+
+
 
 
 ### 🖼️ Qualitative Results: 
